@@ -4292,10 +4292,12 @@ namespace ZGWUI
                                     u64ExtAddr |= au8Data[u8PayloadIndex];
                                 }
 
-                                au16NwkAddr[i] = u16NwkAddr;
+                                if (i < 16)
+                                {
+                                    au16NwkAddr[i] = u16NwkAddr;
 
-                                au64ExtAddr[i] = u64ExtAddr;
-
+                                    au64ExtAddr[i] = u64ExtAddr;
+                                }
                                 u8Depth = au8Data[u8PayloadIndex++];
                                 u8Lqi = au8Data[u8PayloadIndex++];
                                 u8Flags = au8Data[u8PayloadIndex++];
@@ -10138,9 +10140,11 @@ namespace ZGWUI
                 case 0x0402:
                     // la temperature se situe à l'offset 11,12 du buffer 
                     // exemple Température = 0x0989 = 2441 / 100 = 24.41
-                    temperature = au8AttribData[11];
+                    //temperature = au8AttribData[11];
+                    temperature = au8AttribData[12];
                     temperature <<= 8;
-                    temperature |= au8AttribData[12];
+                    //    temperature |= au8AttribData[12];
+                    temperature |= au8AttribData[13];
                     val = Convert.ToDouble(temperature);
                     val = val / 100.0;
                     label1.Text = "degres celcius";
@@ -10149,10 +10153,12 @@ namespace ZGWUI
                     break;
                 case 0x0405:
                     // l'humidite se situe à l'offset 11,12 du buffer 
-                    humidity = au8AttribData[11];
+                    //                    humidity = au8AttribData[11];
+                    humidity = au8AttribData[12];
                     humidity <<= 8;
-                    humidity |= au8AttribData[12];
-                    val = Convert.ToDouble(humidity);
+                    //        humidity |= au8AttribData[12];
+                    humidity |= au8AttribData[13];
+                    val = Convert.ToDouble(humidity);                  
                     val = val / 100.0;
 
                     label2.Text = "humidité %";
