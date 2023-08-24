@@ -10,7 +10,7 @@ the steps to check your configuration is :
 2. Open Port
 3. Start NWK
 4. Permit Join FFFC, FE (orange led must blink)
-5. appairing the temperature sensor (pudh the button during 5 s, light blue must blink)
+5. appairing the temperature sensor (push the button during 5 s, light blue must blink)
 6. Observe frame temperature and humidity in sheet "Temperature"
 
 
