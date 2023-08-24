@@ -31,3 +31,16 @@ D:\projet_yanns\controlbridge\tools\TestGUI\Source\obj\x86\Debug\ZGWUI.csproj.Ge
 D:\projet_yanns\controlbridge\tools\TestGUI\Source\obj\x86\Debug\ZGWUI.csproj.CoreCompileInputs.cache
 D:\projet_yanns\controlbridge\tools\TestGUI\Source\obj\x86\Debug\ZGWUI.exe
 D:\projet_yanns\controlbridge\tools\TestGUI\Source\obj\x86\Debug\ZGWUI.pdb
+D:\projets\gateway_jn5169\dossier_github\modif\TestGUI\Source\bin\Debug\ZGWUI.exe.config
+D:\projets\gateway_jn5169\dossier_github\modif\TestGUI\Source\bin\Debug\ZGWUI.exe
+D:\projets\gateway_jn5169\dossier_github\modif\TestGUI\Source\bin\Debug\ZGWUI.pdb
+D:\projets\gateway_jn5169\dossier_github\modif\TestGUI\Source\obj\x86\Debug\ZGWUI.csproj.AssemblyReference.cache
+D:\projets\gateway_jn5169\dossier_github\modif\TestGUI\Source\obj\x86\Debug\ZGWUI.csproj.SuggestedBindingRedirects.cache
+D:\projets\gateway_jn5169\dossier_github\modif\TestGUI\Source\obj\x86\Debug\ListManagement.ListManager.resources
+D:\projets\gateway_jn5169\dossier_github\modif\TestGUI\Source\obj\x86\Debug\ZGWUI.Form1.resources
+D:\projets\gateway_jn5169\dossier_github\modif\TestGUI\Source\obj\x86\Debug\PortSet.PortSettings.resources
+D:\projets\gateway_jn5169\dossier_github\modif\TestGUI\Source\obj\x86\Debug\ZGWUI.Properties.Resources.resources
+D:\projets\gateway_jn5169\dossier_github\modif\TestGUI\Source\obj\x86\Debug\ZGWUI.csproj.GenerateResource.cache
+D:\projets\gateway_jn5169\dossier_github\modif\TestGUI\Source\obj\x86\Debug\ZGWUI.csproj.CoreCompileInputs.cache
+D:\projets\gateway_jn5169\dossier_github\modif\TestGUI\Source\obj\x86\Debug\ZGWUI.exe
+D:\projets\gateway_jn5169\dossier_github\modif\TestGUI\Source\obj\x86\Debug\ZGWUI.pdb
