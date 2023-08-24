@@ -1,19 +1,14 @@
 # -*- coding: utf-8 -*-
 """
 Created on Tue Nov 20 21:27:00 2018
-@author: yann brengel
-
-#
-# For the full copyright and license information, please view the LICENSE
-# file that was distributed with this source code.
-
+@author: yann
 """
 #!/usr/bin/python
 
 import paho.mqtt.publish as publish
 import paho.mqtt.client  as paho
 import json
-import socket,select
+import socket
 import sys
 import os
 import logging
@@ -21,6 +16,8 @@ import csv
 import datetime
 import time
 import argparse
+import psutil
+import re
 from threading import Timer,Thread
 from pydispatch import dispatcher
 from version import __version__
@@ -43,6 +40,7 @@ class mqtt_subscribe(Thread):
 
    # dictionary
    dict_topics =  [  {'type' : 'cmd' , 'topic':   'reset'     },
+                     {'type' : 'cmd' , 'topic':   'resetrsp'  },
                      {'type' : 'cmd' , 'topic':   'permit'    },
                      {'type' : 'proc', 'topic':   'chanmask'  },
                      {'type' : 'ctrl', 'topic':   'lmp'       },
@@ -128,13 +126,13 @@ class mqtt_subscribe(Thread):
 
     # callback
    def on_message(self,mosq, obj, msg):
-#      logging.info("message iphone {} ".format(msg.topic))
+      logging.info("message iphone {} ".format(msg.topic))
       topic = msg.topic
       #logging.info("topic decode {} ".format(topic))
       # si topic est dans le dico
       if msg.payload: 
          payload = msg.payload.decode()
-         #logging.info("payload {} ".format(payload))
+         logging.info("payload {} ".format(payload))
       if topic.count('/') == 1:
          type_mess,cmd = topic.split('/')
       elif topic.count('/') == 2:
@@ -147,20 +145,24 @@ class mqtt_subscribe(Thread):
       except KeyError:
          logging.info ("error topic not exist ")
       if topic_search:
-#         logging.info("topic search {}".format(topic_search))
+         logging.info("topic search {}".format(topic_search))
          if topic_search["topic"] == "device" and payload == "True": # si demande d'envoi de la liste des device       
                dispatcher.send(message="request list device",signal=PUBLISH_SIGNAL, sender=PUBLISH_SENDER)
                logging.info("dispatcher send list device")
-         elif topic_search["topic"] == "reset" and payload == "0":   # reset factory
-               dispatcher.send(message="request clear device",signal=PUBLISH_SIGNAL, sender=PUBLISH_SENDER)
+         elif topic_search["topic"] == "reset" and payload == "True":   # reset 
+            #   dispatcher.send(message="request clear device",signal=PUBLISH_SIGNAL, sender=PUBLISH_SENDER)
+               json_string = { topic_search['type']  : { topic_search['topic']: 0 }}
+         elif topic_search["topic"] == "resetrsp" and payload == "True":   # reset factory
+            #   dispatcher.send(message="request clear device",signal=PUBLISH_SIGNAL, sender=PUBLISH_SENDER)
+               json_string = { topic_search['type']  : { topic_search['topic']: 0 }}
          elif topic_search["topic"] == "permit" and payload == "True":          
-            json_string = { topic_search['type'] :  { "setpermit":"1", "duration":180 }}
+            json_string = { topic_search['type'] :  { "setpermit":"1", "duration":180 }}       
          elif topic_search["topic"]  == "plug" or topic_search["topic"]  == "lmp":
             mac = self.get_mac_device(id_device)
             json_string = {  topic_search['type'] : { "mac":mac,"cmd":payload}}        
          else:
             json_string = { topic_search['type']  : { topic_search['topic']: int(msg.payload) }}
-         #logging.info("json string send to controller interface {}".format(json_string))
+         logging.info("json string send to controller interface {}".format(json_string))
          self.wr_json_message(json_string)                  
      # else:
 #         logging.info(" ah bon") 
@@ -177,7 +179,7 @@ class mqtt_subscribe(Thread):
 
     # callback
    def on_connect(self, client, obj, flags, rc):
-#      logging.info("MQTT connected with result code {}".format(rc))
+      logging.info("MQTT connected with result code {}".format(rc))
       self.client.subscribe("cmd/#", 0)
       self.client.subscribe("proc/#", 0)
       self.client.subscribe("ctrl/#", 0)
@@ -204,7 +206,7 @@ class mqtt_publish(Thread):
 
    # voir definition zigbee device
    SMART_PLUG                = "81"
-   SENSOR_TEMPERATURE        = "24321"
+   SENSOR_TEMPERATURE        = "770"
    LAMP_ONOFF                = "0"
   
    MESSAGE_DATABASE_SENSOR   = ["dbp","state","type_mess","time","mac","value","parent_mac"]
@@ -253,18 +255,19 @@ class mqtt_publish(Thread):
 
    # extraction des messages stocke dans la socket
    def extract_message(self,message):
-      list_dbp = []
+      list_dbp = []       
       mess_dbp = message.decode('utf-8').split(" ")
       for i in range(len(mess_dbp)):
         if 'dbp' in mess_dbp[i]:
             if mess_dbp[i+2] == "gw" or  mess_dbp[i+2] == "bat" or mess_dbp[i+2] == "tmp" or  mess_dbp[i+2] == "hum" or mess_dbp[i+2] == "st":
                list_dbp.append(mess_dbp[i:i+7])
+      logging.info("list dbp  = {}".format(list_dbp)) 
       return list_dbp
       
    # envoi liste device sur requete
    def send_list_device(self):
       mess_mqtt = ""
-      for dbp,state,type_mess,id,mac,adress,type_dev in self.list_device:
+      for id,type_dev in self.list_device:
          if type_dev == self.SENSOR_TEMPERATURE:
             mess_mqtt = mess_mqtt +" SENSOR_TEMPERATURE"+id+","
          elif type_dev == self.SMART_PLUG:
@@ -272,16 +275,21 @@ class mqtt_publish(Thread):
          elif type_dev == self.LAMP_ONOFF:
             mess_mqtt = mess_mqtt +" LAMP_ONOFF"+id+","
       if mess_mqtt != "":
-         logging.info("publish mess gateway mqtt")
+         logging.info("publish mess gateway mqtt = {}".format(mess_mqtt))
          publish.single(topic="gateway/device", payload=mess_mqtt[:-1], hostname=self.ip,transport="websockets")      
       self.request_list_device = False
         
    def run(self):
       logging.info("start thread publish ")
       while 1:
+         # read_sockets,write_socket, error_socket = select.select(self.inout, self.inout, [])
+         # if len(read_sockets) != 0:
+        #    sur demande utilsateur , envoi liste
         if self.request_list_device == True:
            self.send_list_device()        
         new_data = self.socket.recv(2048)
+        # rx_buffer_temp_length = len(rx_buffer_temp)
+        # recv_buffer = max(recv_buffer, rx_buffer_temp_length)  # keep to the max needed/found
         if len(new_data) != 0:
            #logging.info("message socket = {}".format(new_data))
            list_mess_dbp = self.extract_message(new_data)
@@ -289,7 +297,9 @@ class mqtt_publish(Thread):
              # logging.info("message dbp = {}".format(mess_dbp))
               if mess_dbp[MESSAGE_DATABASE_GW.index("type_mess")] == "gw":  # gateway discovery
                     type_dev = mess_dbp[MESSAGE_DATABASE_GW.index("type_dev")]
-                    #logging.info("type_dev  = {}".format(type_dev)) 
+                    id    = mess_dbp[MESSAGE_DATABASE_GW.index("id")]
+                    value =id,type_dev
+                    # logging.info("type_dev  = {}".format(id)) 
                     dispatcher.send(message=mess_dbp,signal=SUBSCRIBE_SIGNAL, sender=SUBSCRIBE_SENDER)                                            
                     if type_dev == self.SENSOR_TEMPERATURE:
                        id    = mess_dbp[MESSAGE_DATABASE_GW.index("id")]
@@ -303,8 +313,9 @@ class mqtt_publish(Thread):
                        id = 10000
                     if mess_dbp[MESSAGE_DATABASE_GW.index("mac")] not in self.dict_gw:
                        self.dict_gw[mess_dbp[MESSAGE_DATABASE_GW.index("mac")]] = id                       
-                    if mess_dbp not in self.list_device:
-                       self.list_device.append(mess_dbp)                        
+                    if value not in self.list_device:
+					  
+                       self.list_device.append(value)                        
               elif mess_dbp[MESSAGE_DATABASE_ST.index("type_mess")] == "st":  # state device
                    state = mess_dbp[MESSAGE_DATABASE_ST.index("cmd")]
                    #logging.info("state  = {}".format(state))   
@@ -332,7 +343,7 @@ class mqtt_publish(Thread):
                        self.count =  self.dict_count[id_temp]                         
                        self.count = self.count + 1
                        self.dict_count[id_temp] = self.count                    
-                     #logging.info("temperature =   {}".format(temperature))
+                     #logging.info("temperature =   {}".format(type(id_temp)))
                      topic_temp  = "sensor/tmp" + "/" + id_temp
                      topic_count = "sensor/count" + "/" + id_temp
                      publish.single(topic=topic_temp,  payload=temperature, hostname=self.ip,retain=True,transport="websockets")
@@ -404,6 +415,15 @@ def heartbeat(hearbeat,ip,thread_publish,thread_subscribe):
    else:
       logging.info("thread is dead, system must reboot")
       os.system("sudo reboot")
+   list_proc = psutil.pids()
+   proc = lambda x : psutil.Process(x)
+   process=map(proc,list_proc)
+   found =[p for p in process if p.name()=="iot_dbp"]
+   if not found:
+      logging.info("iot is dead, system must reboot")
+      os.system("sudo reboot")
+      
+   
 
 if __name__ == '__main__':
     
