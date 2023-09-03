@@ -35,6 +35,7 @@
  * Copyright NXP B.V. 2012. All rights reserved
  *
  ***************************************************************************/
+ /* YBRENGEL : adaptation JN5189 : SIMPLE_XIAOMI_TEMPERATURE_SENSOR        */
 
 #ifndef  ZIGBEECONSTANT_H_INCLUDED
 #define  ZIGBEECONSTANT_H_INCLUDED
@@ -85,7 +86,7 @@ extern "C" {
 #define SIMPLE_DESCR_OCCUPANCY_SENSOR  0x0107   // ZH/ZLO - Occupancy Sensor
 
 // YB capteur xiaomi
-#define SIMPLE_XIAOMI_TEMPERATURE_SENSOR  0x5F01   // xiaomi sensor, on le range dans les sensor
+#define SIMPLE_XIAOMI_TEMPERATURE_SENSOR  0x0302   // xiaomi sensor, on le range dans les sensor
 // YB lamp hue
 #define SIMPLE_LAMP_HUE                   0x0000   //lamp hue
 
