@@ -4,6 +4,8 @@ gateway zigbee raspberry JN5189
 
 this repository contains a migration to gateway zigbee with new micontroller JN5189
 
+it is in progress ...
+
 To check appairing from your device, use the tools ZWGUI
 the steps to check your configuration is :
 1. configure Settings
