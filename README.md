@@ -17,3 +17,12 @@ the steps to check your configuration is :
 
 
 ![temperature](https://github.com/monk31/gateway_zigbee_3.0_V2/assets/13630510/ba42cc73-4537-46f8-b381-f608dbb3a6d1)
+
+
+
+
+here a example with IOT ON OFF appli in android
+MQTTis configure with websocket
+
+
+![Screenshot_2023-09-05-22-07-34-423_goliath mobile device iotonoff](https://github.com/monk31/gateway_zigbee_3.0_V2/assets/13630510/fc2f73b4-cfee-42c8-924c-7437e4dd658e)
