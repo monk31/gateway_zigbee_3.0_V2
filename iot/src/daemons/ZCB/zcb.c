@@ -1379,7 +1379,9 @@ static void ZCB_HandleAttributeReport(void *pvUser, uint16_t u16Length, void *pv
 	{
 	  printf( "data  = %u\n", u16Length );
 	}*/
-	// modification de la structure 
+	// modification de la structure
+	
+	
     struct _tsAttributeReport {
         uint8_t     u8SequenceNo;
         uint16_t    u16ShortAddress;
