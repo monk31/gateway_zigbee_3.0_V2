@@ -206,7 +206,7 @@ class mqtt_publish(Thread):
 
    # voir definition zigbee device
    SMART_PLUG                = "81"
-   SENSOR_TEMPERATURE        = "770"
+   SENSOR_TEMPERATURE        = "24321"
    LAMP_ONOFF                = "0"
   
    MESSAGE_DATABASE_SENSOR   = ["dbp","state","type_mess","time","mac","value","parent_mac"]
@@ -261,7 +261,7 @@ class mqtt_publish(Thread):
         if 'dbp' in mess_dbp[i]:
             if mess_dbp[i+2] == "gw" or  mess_dbp[i+2] == "bat" or mess_dbp[i+2] == "tmp" or  mess_dbp[i+2] == "hum" or mess_dbp[i+2] == "st":
                list_dbp.append(mess_dbp[i:i+7])
-      logging.info("list dbp  = {}".format(list_dbp)) 
+      #logging.info("list dbp  = {}".format(list_dbp)) 
       return list_dbp
       
    # envoi liste device sur requete
@@ -294,7 +294,7 @@ class mqtt_publish(Thread):
            #logging.info("message socket = {}".format(new_data))
            list_mess_dbp = self.extract_message(new_data)
            for mess_dbp in list_mess_dbp:
-             # logging.info("message dbp = {}".format(mess_dbp))
+              #logging.info("message dbp = {}".format(mess_dbp))
               if mess_dbp[MESSAGE_DATABASE_GW.index("type_mess")] == "gw":  # gateway discovery
                     type_dev = mess_dbp[MESSAGE_DATABASE_GW.index("type_dev")]
                     id    = mess_dbp[MESSAGE_DATABASE_GW.index("id")]
@@ -329,7 +329,7 @@ class mqtt_publish(Thread):
                  value =  mess_dbp[self.MESSAGE_DATABASE_SENSOR.index("value")]
                  time  =  mess_dbp[self.MESSAGE_DATABASE_SENSOR.index("time")]
                  delta_time = self.compute_deltatime(time)
-                # logging.info("delta = {}".format(delta_time))
+                 #logging.info("value = {}".format(value))
                  # recuperation id suivant adresse mac
                  mac = mess_dbp[self.MESSAGE_DATABASE_SENSOR.index("mac")]
                  if mac in self.dict_gw.keys():                         
@@ -338,12 +338,12 @@ class mqtt_publish(Thread):
                      temperature = conversion/100
                      self.dict_temp[id_temp]=temperature
                      self.write_temp(id_temp,delta_time,temperature)
-#                         self.logger.info(" id;"+id_temp+" time;"+str(delta_time)+" temp;"+str(temperature))
+                     #logging.info(" id;"+id_temp+" time;"+str(delta_time)+" temp;"+str(temperature))
                      if id_temp in self.dict_count:
                        self.count =  self.dict_count[id_temp]                         
                        self.count = self.count + 1
                        self.dict_count[id_temp] = self.count                    
-                     #logging.info("temperature =   {}".format(type(id_temp)))
+                       #logging.info("id temperature =   {}".format(id_temp))
                      topic_temp  = "sensor/tmp" + "/" + id_temp
                      topic_count = "sensor/count" + "/" + id_temp
                      publish.single(topic=topic_temp,  payload=temperature, hostname=self.ip,retain=True,transport="websockets")
@@ -373,7 +373,7 @@ class mqtt_publish(Thread):
                         value_conso = (float)(conversion - 16519)/ 9.96;
                         if value_conso <0:
                            value_conso = 0.0
-                        #logging.info("conso smart plug = {}".format(value_conso))
+                        logging.info("conso smart plug = {}".format(value_conso))
                         topic_bat = "sensor/power" + "/" + id_bat 
                         publish.single(topic=topic_bat, payload=value_conso, hostname=self.ip,retain=True,transport="websockets")
 

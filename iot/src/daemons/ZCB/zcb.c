@@ -30,7 +30,7 @@
 // Macros
 // ---------------------------------------------------------------
 
-#define ZCB_DEBUG
+//#define ZCB_DEBUG
 
 #ifdef ZCB_DEBUG
 #define DEBUG_PRINTF(...) printf(__VA_ARGS__)
@@ -1366,31 +1366,31 @@ static void ZCB_HandleMatchDescriptorResponse(void *pvUser, uint16_t u16Length, 
             );
 }
 
-
+/* YB JN5189 , modif structure */
 static void ZCB_HandleAttributeReport(void *pvUser, uint16_t u16Length, void *pvMessage) {
     DEBUG_PRINTF( "\n************ ZCB_HandleAttributeReport\n" );
     // { 0x29 0x06 0x19 0x01 0x04 0x02 0x00 0x00 0x29 0x00 0x02 0x08 0x0f }
 	// u8SequenceNo,u16ShortAddress
 //	char temp[100];
-//	uint16_t i;
-//	*psMessage = &temp[0];
+/*	uint16_t i;
+	
+
+     printf( "len  = 0x%04X\n", u16Length );*/
 	
 	/*for (i=0 ; i< u16Length;i++)
 	{
-	  printf( "data  = %u\n", u16Length );
+	  printf( "data  = %u\n", pvMessage-> );
 	}*/
-	// modification de la structure
-	
-	
+	// modification de la structure 
     struct _tsAttributeReport {
         uint8_t     u8SequenceNo;
         uint16_t    u16ShortAddress;
         uint8_t     u8Endpoint;
         uint16_t    u16ClusterID;
         uint16_t    u16AttributeID;
-		uint8_t     u8Type;
-        uint8_t     u8AttributeStatus;       
-        uint8_t    u16SizeOfAttributesInBytes;
+        uint8_t     u8AttributeStatus; 
+        uint8_t     u8Type;		
+        uint16_t    u16SizeOfAttributesInBytes;
         union {
             uint8_t     u8Data;
             uint16_t    u16Data;
@@ -1403,6 +1403,15 @@ static void ZCB_HandleAttributeReport(void *pvUser, uint16_t u16Length, void *pv
     psMessage->u16ClusterID     = ntohs(psMessage->u16ClusterID);
     psMessage->u16AttributeID   = ntohs(psMessage->u16AttributeID);
     
+ 
+   /*
+	
+	  printf( "u8Endpoint  = %02X\n", psMessage->u8Endpoint );
+	  printf( "u8SequenceNo  = %02X\n", psMessage->u8SequenceNo );
+	  printf( "u8AttributeStatus  = %02X\n", psMessage->u8AttributeStatus );
+	  printf( "u8Type  = %02X\n", psMessage->u8Type );
+	*/
+	DEBUG_PRINTF( "Attribute report size data 0x%02X\n",psMessage->u16SizeOfAttributesInBytes);
     DEBUG_PRINTF( "Attribute report from 0x%04X - Endpoint %d, cluster 0x%04X, attribute 0x%04X.\n", 
                 psMessage->u16ShortAddress,
                 psMessage->u8Endpoint,
@@ -1412,7 +1421,7 @@ static void ZCB_HandleAttributeReport(void *pvUser, uint16_t u16Length, void *pv
     
     uint64_t u64Data = 0;
     volatile int32_t  i32Data;
-
+    printf( "attribute data type (%d)\n", psMessage->u8Type );
     switch(psMessage->u8Type) {
         case(E_ZCL_GINT8):
         case(E_ZCL_UINT8):
