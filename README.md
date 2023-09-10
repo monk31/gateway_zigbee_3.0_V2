@@ -3,11 +3,16 @@ gateway zigbee raspberry JN5189
 
 
 this repository contains a migration to gateway zigbee with new micontroller JN5189
+it use a usb key 0M15080 from NXP semiconductors
+
+![usb](https://github.com/monk31/gateway_zigbee_3.0_V2/assets/13630510/c575a6ea-4cb4-4e75-b4a4-fe1948d3933c)
+
 
 object xiaomi smart plug and temperature are validated
 unfortunately lamp hue cause a problem with Factory reset
 
-To check appairing from your device, use the tools ZWGUI
+
+To check appairing from your device, you can use the tools ZWGUI
 the steps to check your configuration is :
 1. configure Settings
 2. Open Port
@@ -21,9 +26,13 @@ the steps to check your configuration is :
 
 
 
+For request with MQTT protocol, you can use a application
+compatible with websocket
+this application has been tested withIOT/ON off
 
-here a example with IOT ON OFF appli in android
-MQTTis configure with websocket
+https://www.iot-onoff.com/
 
 
-![Screenshot_2023-09-05-22-07-34-423_goliath mobile device iotonoff](https://github.com/monk31/gateway_zigbee_3.0_V2/assets/13630510/fc2f73b4-cfee-42c8-924c-7437e4dd658e)
+
+
+
